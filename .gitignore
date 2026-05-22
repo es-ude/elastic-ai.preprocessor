@@ -1,0 +1,8 @@
+**/.python-version
+elasticai/__init__.py
+**/build*
+
+**/.venv
+**/.env
+**/.devenv
+**/__pycache__
