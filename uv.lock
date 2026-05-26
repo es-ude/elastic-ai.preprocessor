@@ -345,7 +345,7 @@ dev = [
     { name = "build", specifier = ">=1.2.2.post1" },
     { name = "cffi", specifier = ">=2.0.0" },
     { name = "coverage", specifier = ">=7.11.3" },
-    { name = "elasticai-creator", git = "https://github.com/es-ude/elastic-ai.creator.git?branch=add-string-conversion-array" },
+    { name = "elasticai-creator", git = "https://github.com/es-ude/elastic-ai.creator.git?branch=main" },
     { name = "hypothesis", specifier = ">=6.152.9" },
     { name = "matplotlib", specifier = ">=3.10.9" },
     { name = "pre-commit", specifier = ">=4.0.1" },
@@ -358,7 +358,7 @@ test = [{ name = "cocotb", specifier = ">=2.0.1" }]
 [[package]]
 name = "elasticai-creator"
 version = "0.68.0"
-source = { git = "https://github.com/es-ude/elastic-ai.creator.git?branch=add-string-conversion-array#81c3346749188c387cbf53776427bf4d346ac493" }
+source = { git = "https://github.com/es-ude/elastic-ai.creator.git?branch=main#3bfb719887f5a1decbb7e355a0899f210060452f" }
 dependencies = [
     { name = "cocotb" },
     { name = "numpy" },
