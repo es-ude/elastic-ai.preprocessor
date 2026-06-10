@@ -8,7 +8,7 @@ from elasticai.preprocessor.translation.ir2c import (
     replace_variables_with_parameters,
     generate_c_files,
 )
-import plugins_c.filter_data as design_plugin
+import elasticai.creator_plugins.plugins_c.filter_data as design_plugin
 
 
 def build_filter_iir(
