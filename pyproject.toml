@@ -60,7 +60,6 @@ exclude = [
   ".venv",
   "build*",
   "equi_checker",
-  "plugins_c",
   "plugins_python",
   "**/*_test.py"
 ]
@@ -72,7 +71,6 @@ exclude = [
   ".venv",
   "build*",
   "equi_checker",
-  "plugins_c",
   "plugins_python",
   "**/*_test.py"
 ]
@@ -88,7 +86,6 @@ exclude = [
   ".venv",
   "build*",
   "equi_checker",
-  "plugins_c",
   "plugins_python"
 ]
 # Same as Black.

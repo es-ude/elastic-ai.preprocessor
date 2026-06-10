@@ -3,7 +3,7 @@ from os.path import dirname, abspath
 from datetime import datetime
 
 
-import plugins_c.filter_data as design_plugin
+import elasticai.creator_plugins.plugins_c.filter_data as design_plugin
 from elasticai.preprocessor import get_path_to_project
 from elasticai.preprocessor.framing import SettingsFrame, FrameGenerator
 from elasticai.preprocessor.translation.ir2c import (

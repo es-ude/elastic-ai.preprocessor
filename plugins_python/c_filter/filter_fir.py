@@ -1,7 +1,7 @@
 from os.path import dirname, abspath
 from datetime import datetime
 
-import plugins_c.filter_data as design_plugin
+import elasticai.creator_plugins.plugins_c.filter_data as design_plugin
 from elasticai.preprocessor.filter import Filtering, SettingsFilter
 from elasticai.preprocessor.translation.ir2c import (
     get_embedded_datatype,
