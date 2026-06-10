@@ -1,5 +1,13 @@
+from pathlib import Path
+import subprocess
+
 from src.loader import PrecompiledLoader, CompileLoader
 
+FIXTURE_DIR = Path(__file__).resolve().parents[1] / "c_funcs" / "adder"
+HEADER = FIXTURE_DIR / "add.h"
+SOURCE = FIXTURE_DIR / "add.c"
+PRECOMPILED_BUILD_DIR = FIXTURE_DIR / "build_precompiled"
+PRECOMPILED_LIBRARY = PRECOMPILED_BUILD_DIR / "libadd.so"
 
 # --- python implementation ---
 def add(a, b):
@@ -8,8 +16,14 @@ def add(a, b):
 
 # --- precompiled version ---
 
+PRECOMPILED_BUILD_DIR.mkdir(exist_ok=True)
+subprocess.run(
+    ["cc", "-shared", "-fPIC", "-o", str(PRECOMPILED_LIBRARY), str(SOURCE)],
+    check=True,
+)
+
 loader = PrecompiledLoader(
-    library_path="./c_funcs/libadd.so", headers="./c_funcs/add.h"
+    library_path=str(PRECOMPILED_LIBRARY), headers=str(HEADER)
 )
 
 lib = loader.load()  # returns the loaded shared library
@@ -26,11 +40,9 @@ def test_equivalence_precompiled():
 # --- compiled version ---
 
 compile_loader = CompileLoader(
-    headers="/home/benni/code/uni/eeg/eeg-software/function_equivalence_test/c_funcs/add.h",
-    sources=[
-        "/home/benni/code/uni/eeg/eeg-software/function_equivalence_test/c_funcs/add.c"
-    ],
-    build_dir="/home/benni/code/uni/eeg/eeg-software/function_equivalence_test/c_funcs/build_compile_loader",
+    headers=str(HEADER),
+    sources=[str(SOURCE)],
+    build_dir=str(FIXTURE_DIR / "build_compile_loader"),
 )
 
 lib2 = compile_loader.load()  # compiles the C code and returns a library
