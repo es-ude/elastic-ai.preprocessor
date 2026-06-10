@@ -3,7 +3,7 @@ name = "function-equivalence-test"
 version = "0.1.0"
 description = "Framework for Enabling Hardware-Software Co-Design / Equivalence Checking"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "cffi",
     "hypothesis",
