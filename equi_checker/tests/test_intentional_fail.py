@@ -1,5 +1,5 @@
-from equi_checker.src.equivalence import compare_values
-from equi_checker.src.loader import CompileLoader
+from src.equivalence import compare_values
+from src.loader import CompileLoader
 
 
 def add_python_wrong(a: int, b: int) -> int:
