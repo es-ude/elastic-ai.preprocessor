@@ -1,4 +1,4 @@
-from equi_checker.src.loader import CompileLoader
+from src.loader import CompileLoader
 import numpy as np
 
 
