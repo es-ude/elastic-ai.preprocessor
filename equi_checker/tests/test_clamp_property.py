@@ -1,6 +1,6 @@
 from hypothesis import given, strategies as st
 
-from equi_checker.src.loader import CompileLoader
+from src.loader import CompileLoader
 
 
 def py_clamp_int(value: int, lower: int, upper: int) -> int:
