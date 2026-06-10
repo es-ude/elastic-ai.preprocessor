@@ -1,4 +1,4 @@
-from equi_checker.src.loader import PrecompiledLoader, CompileLoader
+from src.loader import PrecompiledLoader, CompileLoader
 
 
 # --- python implementation ---
