@@ -6,3 +6,5 @@ elasticai/__init__.py
 **/.env
 **/.devenv
 **/__pycache__
+**/.idea
+**/.DS_STORE
