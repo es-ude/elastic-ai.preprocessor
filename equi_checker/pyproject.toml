@@ -8,7 +8,8 @@ dependencies = [
     "cffi",
     "hypothesis",
     "pytest",
-    "numpy"
+    "numpy",
+    "setuptools>=82.0.1",
 ]
 
 [tool.pytest.ini_options]
