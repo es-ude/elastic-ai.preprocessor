@@ -2,9 +2,6 @@ from pathlib import Path
 from typing import Any
 
 import elasticai.creator.ir2verilog as ir
-import elasticai.creator_plugins.adders as adders
-import elasticai.creator_plugins.mac as mac
-import elasticai.creator_plugins.multipliers as mult
 from elasticai.creator.file_generation import find_project_root as get_path_to_build
 from elasticai.creator.ir import Registry, attribute
 from elasticai.creator.ir2verilog import Ir2Verilog, factory
@@ -16,6 +13,7 @@ def load_and_plugin(
     params: dict[str, Any],
     packages: list,
     path2save: Path = get_path_to_build() / "build",
+    add_ringbuffer: bool = False,
 ) -> None:
     def _load_and_plugin_design(
         type: str, id: str, params: dict[str, Any], packages: list, path2save: Path
@@ -30,20 +28,14 @@ def load_and_plugin(
             (build_dir / name).write_text("".join(content))
 
     _load_and_plugin_design(type, id, params, packages, path2save)
-    _load_and_plugin_design(
-        "mac",
-        "",
-        params={"BITWIDTH": params["BITWIDTH"]},
-        packages=[mac],
-        path2save=path2save,
-    )
-    _load_and_plugin_design(
-        "mult_dsp",
-        "",
-        params={"BITWIDTH": params["BITWIDTH"]},
-        packages=[mult, adders],
-        path2save=path2save,
-    )
+    if add_ringbuffer:
+        _load_and_plugin_design(
+            "ring_buffer",
+            "",
+            params={"BITWIDTH": params["BITWIDTH"], "SAMPLES": params["SAMPLES"]},
+            packages=["windower"],
+            path2save=path2save,
+        )
 
 
 def _build_verilog_implementation(type: str, id: str, params: dict[str, Any]) -> ir.DataGraph:
