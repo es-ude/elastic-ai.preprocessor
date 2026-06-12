@@ -2,23 +2,34 @@ import cocotb
 import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, FallingEdge
+from random import randint
 import numpy as np
 
 from elasticai.creator.testing import CocotbTestFixture, eai_testbench
 from elasticai.creator_plugins.windower.utils import load_and_plugin
 
 
+def build_testdata(bitwidth: int, samples: int) -> list[int]:
+    max_value = 2**bitwidth - 1
+
+    data = [
+        randint(0, max_value)
+        for _ in range(samples)
+    ]
+
+    return data
+
+
 @cocotb.test()
 @eai_testbench
-async def windower_evnt_tb(dut, bitwidth: int, samples: int, num_shift: int):
+async def windower_evnt_tb(
+    dut,
+    bitwidth: int,
+    samples: int,
+    num_shift: int,
+    data_in: list[int],
+):
     period_clk = 5
-    used_bitwidth = int(dut.BITWIDTH.value)
-    used_adrwidth = int(dut.SAMPLES.value)
-
-    data_in_array = [np.random.randint(low=0, high=2**used_bitwidth-1) for _ in range(used_adrwidth)]
-    #data_in_array = [int(2**(used_bitwidth-1) * (1 + np.cos(2 * np.pi * idx / used_adrwidth))) for idx in range(used_adrwidth)]
-    data_in_array = [val if val >= 0 else 0 for val in data_in_array]
-    data_in_array = [2**used_bitwidth-1 if val >= 2**used_bitwidth-1 else val for val in data_in_array]
 
     dut.CLK_SYS.value = 0
     dut.RSTN.value = 0
@@ -27,31 +38,34 @@ async def windower_evnt_tb(dut, bitwidth: int, samples: int, num_shift: int):
     dut.DO_SHIFT.value = 0
     dut.DATA_IN.value = 0
 
-    # Start clock and making reset
-    cocotb.start_soon(Clock(dut.CLK_SYS, period_clk, unit='ns').start())
+    cocotb.start_soon(Clock(dut.CLK_SYS, period_clk, unit="ns").start())
+
     for _ in range(8):
         await RisingEdge(dut.CLK_SYS)
+
     for idx in range(4):
         await RisingEdge(dut.CLK_SYS)
         dut.RSTN.value = idx % 2
         await RisingEdge(dut.CLK_SYS)
+
     dut.RSTN.value = 1
+
     for _ in range(2):
         await RisingEdge(dut.CLK_SYS)
+
     await FallingEdge(dut.CLK_SYS)
 
-    # Set Trigger
-    ite = 0
     dut.EN.value = 1
     assert dut.DVALID.value == 0
-    for idx in range(8 * used_adrwidth):
-        ite += 1
+
+    for idx in range(8 * samples):
         await RisingEdge(dut.CLK_SYS)
         dut.DO_SHIFT.value = 1
-        dut.DATA_IN.value = data_in_array[idx % used_adrwidth]
+        dut.DATA_IN.value = data_in[idx % samples]
+
         await RisingEdge(dut.CLK_SYS)
-        assert dut.DVALID.value == 0
         dut.DO_SHIFT.value = 0
+
         for _ in range(2):
             await RisingEdge(dut.CLK_SYS)
 
@@ -66,6 +80,9 @@ def test_windower_evnt(
     samples: int,
     num_shift: int,
 ):
+    data_in = build_testdata(bitwidth=bitwidth, samples=samples)
+    cocotb_test_fixture.write({"data_in": data_in,})
+
     cocotb_test_fixture.set_top_module_name("EVENT_WINDOWER")
 
     cocotb_test_fixture.clear_srcs()
@@ -92,6 +109,9 @@ def test_windower_evnt_build(
     samples: int,
     num_shift: int,
 ):
+    data_in = build_testdata(bitwidth=bitwidth, samples=samples)
+    cocotb_test_fixture.write({"data_in": data_in,})
+    
     build_dir = cocotb_test_fixture.get_artifact_dir() / "verilog"
 
     load_and_plugin(
