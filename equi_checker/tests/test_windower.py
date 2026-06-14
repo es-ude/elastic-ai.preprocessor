@@ -1,4 +1,4 @@
-from equi_checker.src.loader import CompileLoader
+from src.loader import CompileLoader
 import numpy as np
 
 
@@ -42,7 +42,7 @@ def test_windower_simple_equivalence():
     loader.get("windower_reset")
     ffi = loader.ffi()
 
-    # Initialize C windower and Python windower with the same window size
+# Initialize C windower and Python windower with the same window size
     window_size = 5
     c_buffer = np.zeros(window_size, dtype=np.float32)
     c_out = np.zeros(window_size, dtype=np.float32)
