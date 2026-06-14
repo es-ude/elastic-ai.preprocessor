@@ -1,0 +1,4 @@
+# file: /home/christoph/Sciebo/Studium/Ang._Inf/13-Sem/ba/clean_code/elastic-ai.preprocessor/equi_checker/src/equivalence.py
+# hypothesis_version: 6.151.10
+
+[1e-06, 'bool equal', 'both Inf (same sign)', 'both NaN', 'int equal', 'values equal']
