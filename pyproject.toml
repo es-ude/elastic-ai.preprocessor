@@ -148,3 +148,7 @@ pythonpath = ["."]
 testpaths = [
   "elasticai/*"
 ]
+norecursedirs = [
+    "plugins_c",
+    "plugins_python"
+]

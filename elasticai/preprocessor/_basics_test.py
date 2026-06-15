@@ -5,7 +5,7 @@ from elasticai.preprocessor import get_path_to_project
 
 class TestHelpFunction(unittest.TestCase):
     def test_get_path_to_project_wo_ref(self):
-        ref = ["elastic-ai", "preprocessing"]
+        ref = ["elastic-ai", "preprocessor"]
         chck = get_path_to_project().as_posix()
         rslt = [True for key in ref if key in chck]
         self.assertTrue(sum(rslt) == 2)
