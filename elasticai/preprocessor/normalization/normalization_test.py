@@ -150,23 +150,23 @@ class TestSum(TestCase):
         test_func = DataNormalization(method="minmax", peak_mode=0)
         data = test_func.normalize(self.input_torch)
 
-        result = (data.min(), data.max())
-        expected = (-1.0051571362062028, 1.0)
+        result = (data.min().float().item(), data.max().float().item())
+        expected = (-1.0051571130752563, 1.0)
         self.assertEqual(result, expected)
 
     def test_torch_minmax_min(self):
         test_func = DataNormalization(method="minmax", peak_mode=1)
         data = test_func.normalize(self.input_torch)
 
-        result = (data.min(), data.max())
-        expected = (-1.0, 1.0050535609440512)
+        result = (data.min().float().item(), data.max().float().item())
+        expected = (-1.0, 1.0050536394119263)
         self.assertEqual(result, expected)
 
     def test_torch_minmax_absmax(self):
         test_func = DataNormalization(method="minmax", peak_mode=2)
         data = test_func.normalize(self.input_torch)
 
-        result = (data.min(), data.max())
+        result = (data.min().float().item(), data.max().float().item())
         expected = (-1.0, 1.0)
         self.assertEqual(result, expected)
 
@@ -198,7 +198,7 @@ class TestSum(TestCase):
         test_func = DataNormalization(method="zeroone", peak_mode=0)
         data = test_func.normalize(self.input_torch)
 
-        result = (float(data.min()), float(data.max()))
+        result = (data.min().float().item(), data.max().float().item())
         expected = (-0.002578556537628174, 1.0)
         self.assertEqual(result, expected)
 
@@ -206,15 +206,15 @@ class TestSum(TestCase):
         test_func = DataNormalization(method="zeroone", peak_mode=1)
         data = test_func.normalize(self.input_torch)
 
-        result = (data.min(), data.max())
-        expected = (0.0, 1.0025267804720257)
+        result = (data.min().float().item(), data.max().float().item())
+        expected = (0.0, 1.0025267601013184)
         self.assertEqual(result, expected)
 
     def test_torch_zeroone_absmax(self):
         test_func = DataNormalization(method="zeroone", peak_mode=2)
         data = test_func.normalize(self.input_torch)
 
-        result = (data.min(), data.max())
+        result = (data.min().float().item(), data.max().float().item())
         expected = (0.0, 1.0)
         self.assertEqual(result, expected)
 

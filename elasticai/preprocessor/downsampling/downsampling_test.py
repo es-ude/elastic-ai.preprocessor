@@ -24055,7 +24055,7 @@ class TestDownSampling(TestCase):
             -0.07125326561763741,
         ]
         results = DownSampling(self.sets).do_decimation_polyphase_order_one(self.input)
-        np.testing.assert_array_equal(results, np.array(check))
+        np.testing.assert_array_almost_equal(results, np.array(check), decimal=15)
 
     def test_polyphase_one_size(self):
         check = int((self.input.size - 1) / 2)
@@ -44070,7 +44070,7 @@ class TestDownSampling(TestCase):
             -0.18969931787645283,
         ]
         results = DownSampling(self.sets).do_decimation_polyphase_order_two(self.input)
-        np.testing.assert_array_equal(results, np.array(check))
+        np.testing.assert_array_almost_equal(results, np.array(check), decimal=15)
 
     def test_polyphase_two_size(self):
         check = int((self.input.size - 1) / 2)

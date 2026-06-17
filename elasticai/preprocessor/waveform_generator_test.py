@@ -456,14 +456,16 @@ class TestWaveformGenerator(TestCase):
                 waveform_select=["SINE_FULL"],
                 polarity_cathodic=[False],
                 bitwidth=6,
-                bitfrac=0,
+                bitfrac=5,
                 signed=False,
                 do_opt=False,
             )
             .signal
         )
-        ref = np.array([32, 48, 59, 63, 59, 48, 32, 16, 4, 0, 4, 15], dtype=np.int32)
-        np.testing.assert_almost_equal(out, ref, decimal=4)
+        ref = np.array(
+            [0.5, 0.75, 0.9375, 1.0, 0.9375, 0.75, 0.5, 0.25, 0.0625, 0.0, 0.0625, 0.25], dtype=np.float16
+        )
+        np.testing.assert_array_equal(out, ref)
 
     def test_waveform_quant_sine_signed_unoptimized(self):
         out = (
@@ -474,14 +476,16 @@ class TestWaveformGenerator(TestCase):
                 waveform_select=["SINE_FULL"],
                 polarity_cathodic=[False],
                 bitwidth=6,
-                bitfrac=0,
+                bitfrac=5,
                 signed=True,
                 do_opt=False,
             )
             .signal
         )
-        ref = np.array([0, 15, 27, 31, 27, 16, 0, -15, -27, -32, -27, -16], dtype=np.int32)
-        np.testing.assert_almost_equal(out, ref, decimal=4)
+        ref = np.array(
+            [0.0, 0.5, 0.875, 1.0, 0.875, 0.5, 0, -0.5, -0.875, -1.0, -0.875, -0.5], dtype=np.float16
+        )
+        np.testing.assert_array_equal(out, ref)
 
     def test_waveform_quant_sine_signed_optimized(self):
         out = (
@@ -492,14 +496,14 @@ class TestWaveformGenerator(TestCase):
                 waveform_select=["SINE_FULL"],
                 polarity_cathodic=[False],
                 bitwidth=6,
-                bitfrac=0,
+                bitfrac=5,
                 signed=True,
                 do_opt=True,
             )
             .signal
         )
-        ref = np.array([0, 15, 27, 31], dtype=np.int32)
-        np.testing.assert_almost_equal(out, ref, decimal=4)
+        ref = np.array([0.0, 0.5, 0.875, 1.0], dtype=np.float16)
+        np.testing.assert_array_equal(out, ref)
 
     def test_waveform_quant_triangular_unsigned_unoptimized(self):
         out = (
@@ -510,14 +514,17 @@ class TestWaveformGenerator(TestCase):
                 waveform_select=["TRI_FULL"],
                 polarity_cathodic=[False],
                 bitwidth=6,
-                bitfrac=0,
+                bitfrac=5,
                 signed=False,
                 do_opt=False,
             )
             .signal
         )
-        ref = np.array([32, 42, 53, 63, 53, 42, 32, 21, 10, 0, 10, 21], dtype=np.int32)
-        np.testing.assert_almost_equal(out, ref, decimal=4)
+        ref = np.array(
+            [0.5, 0.65625, 0.84375, 1.0, 0.84375, 0.65625, 0.5, 0.34375, 0.15625, 0, 0.15625, 0.34375],
+            dtype=np.float16,
+        )
+        np.testing.assert_array_equal(out, ref)
 
     def test_build_random_timestamps(self):
         rslt = WaveformGenerator(sampling_rate=20e3, add_noise=False).build_random_timestamps(
@@ -613,7 +620,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_lut_full_c"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        wvf = WaveformGenerator(sampling_rate=1., add_noise=False).create_design(
+        WaveformGenerator(sampling_rate=1.0, add_noise=False).create_design(
             waveform="SINE_FULL",
             num_params=21,
             target="mcu",
@@ -636,7 +643,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_lut_opt_c"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        wvf = WaveformGenerator(sampling_rate=1., add_noise=False).create_design(
+        WaveformGenerator(sampling_rate=1.0, add_noise=False).create_design(
             waveform="SINE_FULL",
             num_params=11,
             target="mcu",

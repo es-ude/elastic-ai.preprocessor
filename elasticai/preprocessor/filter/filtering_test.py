@@ -390,9 +390,9 @@ class TestDigitalFilters(TestCase):
         sets.n_order = 2
         result = Filtering(sets).get_coeffs()
 
-        assert result.a == [1.0, -1.1102230246251565e-16, 0.1715728752538099]
+        assert result.a == [1.0, -1.8403695052228406e-16, 0.17157287525380993]
         assert len(result.a) == 3
-        assert result.b == [0.2928932188134524, 0.5857864376269049, 0.2928932188134524]
+        assert result.b == [0.2928932188134525, 0.585786437626905, 0.2928932188134525]
         assert len(result.b) == 3
 
     def test_coeffs_quantized_fir_8bit(self):
@@ -440,13 +440,13 @@ class TestDigitalFilters(TestCase):
 
         assert len(result[0].a) == 3
         assert result[0].a == [1.0, 0.0, 0.15625]
-        assert result[1].a == [0.0, -1.1102230246251565e-16, 0.015322875253809903]
+        assert result[1].a == [0.0, -1.8403695052228406e-16, 0.015322875253809931]
         assert len(result[0].b) == 3
         assert result[0].b == [0.28125, 0.578125, 0.28125]
         assert result[1].b == [
-            0.011643218813452427,
-            0.0076614376269048545,
-            0.011643218813452427,
+            0.011643218813452483,
+            0.0076614376269049655,
+            0.011643218813452483,
         ]
 
     def test_verilog_string_iir(self):

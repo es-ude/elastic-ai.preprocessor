@@ -1,9 +1,9 @@
 from dataclasses import dataclass
+from datetime import datetime
 from logging import Logger, getLogger
 from pathlib import Path
 from typing import Callable
 
-from datetime import datetime
 import numpy as np
 from elasticai.creator.arithmetic import FxpArithmetic, FxpParams, int_converter
 from elasticai.creator_plugins.bram.utils import translate_path_to_int, write_mem_file
@@ -13,9 +13,9 @@ import elasticai.creator_plugins.waveform.utils as hw_utils
 from elasticai.creator_plugins.waveform.c.waveform_lut_c import generate_waveform_lut_template
 from elasticai.preprocessor._check_funcs import check_keylist_elements_any
 from elasticai.preprocessor.translation.ir2c import (
+    generate_c_files,
     get_embedded_datatype,
     replace_variables_with_parameters,
-    generate_c_files,
 )
 
 
@@ -482,13 +482,11 @@ class WaveformGenerator:
             "datatype_cnt": get_embedded_datatype(bitwidth=len(wvf), signed=False),
             "datatype_int": get_embedded_datatype(bitwidth, signed=is_signed),
             "num_lutsine": str(len(wvf)),
-            "lut_offset": str(
-                0 if not do_opt else (0 if is_signed else (2 ** (bitwidth_mcu - 1)))
-            ),
-            "lut_data": ", ".join(map(str, wvf))
+            "lut_offset": str(0 if not do_opt else (0 if is_signed else (2 ** (bitwidth_mcu - 1)))),
+            "lut_data": ", ".join(map(str, wvf)),
         }
         # --- Step #3: Replace string parameters with real values
-        path2template = Path(hw_utils.__file__).parent / "c",
+        path2template = (Path(hw_utils.__file__).parent / "c",)
         template = generate_waveform_lut_template(do_opt)
         generate_c_files(
             path2save=path2save.as_posix(),
