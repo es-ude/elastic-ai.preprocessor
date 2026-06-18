@@ -5,21 +5,6 @@ import numpy as np
 from elasticai.creator.arithmetic import FxpArithmetic, FxpParams
 
 
-class CommonAnalogFunctions:
-    _range: list = [-5.0, 5.0]
-
-    def define_voltage_range(self, volt_hgh: float, volt_low: float) -> list:
-        """Defining the voltage range values"""
-        self._range = [volt_low, volt_hgh]
-        return self._range
-
-    def clamp_voltage(self, uin: float | np.ndarray) -> float | np.ndarray:
-        """Do voltage clipping at voltage supply"""
-        uout = np.array(deepcopy(uin))
-        np.clip(uout, a_max=self._range[1], a_min=self._range[0], out=uout)
-        return float(uout) if isinstance(uin, float) else uout
-
-
 class CommonDigitalFunctions:
     _digital_border: np.ndarray
     _bitwidth: list = [2, 0]

@@ -398,8 +398,8 @@ class WaveformGenerator:
                 use_bram=use_bram,
             )
 
-    @staticmethod
     def _create_design_verilog(
+        self,
         waveform: str,
         num_params: int,
         is_signed: bool,
@@ -409,6 +409,7 @@ class WaveformGenerator:
         do_opt: bool,
         use_bram: bool,
     ) -> list[int]:
+        self._logger.debug("Creating Verilog design for Waveform Player")
         path2save.mkdir(parents=True, exist_ok=True)
         conv = int_converter(total_bits=bitwidth if not do_opt else bitwidth - 1, signed=not do_opt)
         wvf = hw_utils.prepare_waveform(
@@ -443,6 +444,7 @@ class WaveformGenerator:
         if do_opt:
             params.update({"SIGNED_OUT": 1 if is_signed else 0})
 
+        self._logger.debug(f"Building Verilog design at {path2save.as_posix()}")
         hw_utils.load_and_plugin(
             type=verilog_type,
             id=id,
@@ -453,8 +455,8 @@ class WaveformGenerator:
         )
         return wvf
 
-    @staticmethod
     def _create_design_c(
+        self,
         waveform: str,
         num_params: int,
         is_signed: bool,
@@ -463,6 +465,7 @@ class WaveformGenerator:
         path2save: Path,
         do_opt: bool,
     ) -> list[int]:
+        self._logger.debug("Creating C design for Waveform Player")
         # --- Step #1: Generating the waveform
         datatype_data_ext = get_embedded_datatype(bitwidth=bitwidth, signed=is_signed)
         bitwidth_mcu = int(datatype_data_ext.split("int")[-1].split("_")[0])
@@ -486,7 +489,8 @@ class WaveformGenerator:
             "lut_data": ", ".join(map(str, wvf)),
         }
         # --- Step #3: Replace string parameters with real values
-        path2template = (Path(hw_utils.__file__).parent / "c",)
+        path2template = Path(hw_utils.__file__).parent / "c"
+        self._logger.debug(f"Building C design at {path2save.as_posix()}")
         template = generate_waveform_lut_template(do_opt)
         generate_c_files(
             path2save=path2save.as_posix(),
@@ -495,6 +499,6 @@ class WaveformGenerator:
             module_id=id.lower(),
             proto_file=replace_variables_with_parameters(template["head"], params),
             impl_file=replace_variables_with_parameters(template["func"], params),
-            path2template=path2template[0].as_posix(),
+            path2template=path2template.as_posix(),
         )
         return wvf
