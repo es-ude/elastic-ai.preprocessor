@@ -97,6 +97,7 @@ def test_replayer_only_data(
     )
 
 
+@pytest.mark.simulation
 @pytest.mark.parametrize("bitwidth, is_signed, num_samples, num_repeat", [(8, True, 12, 2)])
 def test_replayer_data_trgg(
     cocotb_test_fixture: CocotbTestFixture,
@@ -133,6 +134,7 @@ def test_replayer_data_trgg(
     )
 
 
+@pytest.mark.simulation
 @pytest.mark.parametrize("bitwidth, is_signed, num_samples, num_repeat", [(8, True, 12, 2)])
 def test_replayer_data_trgg_build(
     cocotb_test_fixture: CocotbTestFixture,

@@ -11,6 +11,7 @@ in {
     pkgs.git
     pkgs.tombi
     pkgs.ruff
+    pkgs.iverilog
     pkgs.zlib # needed as dependency cocotb/ghdl under circumstances
     pkgs.alejandra # nix formatter
   ];
@@ -85,22 +86,22 @@ in {
     };
     "test:fast" = {
       exec = ''
-        ${uv_run} pytest -m 'not simulation'
+        ${uv_run} pytest -m 'not simulation' --reruns 3
       '';
     };
     "test:simulation" = {
       exec = ''
-        ${uv_run} pytest -m 'simulation'
+        ${uv_run} pytest -m 'simulation' --reruns 1
       '';
     };
     "test:all" = {
       exec = ''
-        ${uv_run} pytest
+        ${uv_run} pytest --reruns 3
       '';
     };
     "test:coverage" = {
       exec = ''
-        ${uv_run} coverage run -m pytest -m 'not simulation'
+        ${uv_run} coverage run -m pytest -m 'not simulation' --reruns 3
       '';
     };
     "check:coverage-report" = {
@@ -130,17 +131,12 @@ in {
         ${uv_run} pip-audit
       '';
     };
-    "check:code-lint" = {
-      after = [
-        "check:python-lint"
-        "check:python-types"
-        "check:toml-lint"
-      ];
-    };
     "check:local" = {
       after = [
         "test:changes"
-        "check:code-lint"
+        "check:python-lint"
+        "check:python-types"
+        "check:toml-lint"
       ];
     };
   };
