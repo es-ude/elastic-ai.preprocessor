@@ -3,8 +3,12 @@ name: Python Lint Check
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  python-lint-uv:
+  linting-uv:
     if: true
     runs-on: ubuntu-latest
     steps:
@@ -25,22 +29,22 @@ jobs:
         run: uv run tombi check .
 
 
-  python-lint-devenv:
-    if: false
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup devenv
-        uses: ./.github/actions/setup-devenv
-
-      - name: Check ruff linting
-        run: devenv tasks check:python-lint
-
-      - name: Check types
-        run: devenv tasks check:python-types
-
-      - name: Check toml linting
-        run: devenv tasks check:toml-lint
+#  linting-devenv:
+#    if: false
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Setup devenv
+#        uses: ./.github/actions/setup-devenv
+#
+#      - name: Check ruff linting
+#        run: devenv tasks check:python-lint
+#
+#      - name: Check types
+#        run: devenv tasks check:python-types
+#
+#      - name: Check toml linting
+#        run: devenv tasks check:toml-lint

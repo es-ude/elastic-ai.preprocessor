@@ -49,12 +49,14 @@ docs = [
 lint = [
   "elastic-ai-equi-checker",
   "ruff>=0.15.14",
+  "tombi>=1.1.3",
   "ty>=0.0.41",
 ]
 test = [
   "cocotb>=2.0.1",
   "pytest>=9.0.3",
   "pytest-testmon>=2.2.0",
+  "pytest-rerunfailures>=16.3",
 ]
 
 [build-system]
@@ -63,6 +65,7 @@ build-backend = "hatchling.build"
 
 [tool.coverage.run]
 source = ["elasticai"]
+relative_files = true
 omit = [
   "**/*_test.py",
   "**/utils.py",

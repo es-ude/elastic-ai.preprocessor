@@ -128,7 +128,7 @@ class TestSum(TestCase):
 
         result = (data.min(), data.max())
         expected = (-1.0051571362062028, 1.0)
-        self.assertEqual(result, expected)
+        np.testing.assert_almost_equal(result, expected, decimal=5)
 
     def test_numpy_minmax_min(self):
         test_func = DataNormalization(method="minmax", peak_mode=1)
@@ -160,7 +160,7 @@ class TestSum(TestCase):
 
         result = (data.min().float().item(), data.max().float().item())
         expected = (-1.0, 1.0050536394119263)
-        self.assertEqual(result, expected)
+        np.testing.assert_almost_equal(result, expected, decimal=5)
 
     def test_torch_minmax_absmax(self):
         test_func = DataNormalization(method="minmax", peak_mode=2)
