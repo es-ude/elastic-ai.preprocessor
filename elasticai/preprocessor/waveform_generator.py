@@ -38,17 +38,11 @@ class WaveformSignal:
 class WaveformGenerator:
     _logger: Logger
 
-    def __init__(
-        self,
-        sampling_rate: float,
-        add_noise: bool = False,
-    ):
+    def __init__(self, sampling_rate: float):
         """Class for generating the transient stimulation signal
         :param sampling_rate:   Sampling rate of the signal
-        :param add_noise:       Boolean for adding noise to output
         """
         self._logger = getLogger(__name__)
-        self.__add_noise: bool = add_noise
         self._sampling_rate: float = sampling_rate
         self._time_duration: float = 1.0
 

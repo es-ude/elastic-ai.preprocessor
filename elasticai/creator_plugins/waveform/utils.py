@@ -17,7 +17,7 @@ def prepare_waveform(
 
     arith = int_arithmetic(total_bits=bitwidth, signed=True)
     sig = (
-        WaveformGenerator(sampling_rate=float(params - 1), add_noise=False)
+        WaveformGenerator(sampling_rate=float(params - 1))
         .generate_waveform_quant_fxp(
             time_points=[0.0],
             time_duration=[1.0],

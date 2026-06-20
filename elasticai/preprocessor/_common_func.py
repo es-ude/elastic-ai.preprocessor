@@ -69,7 +69,6 @@ class CommonDigitalFunctions:
                 out.append(arith.minimum_as_rational)
             else:
                 out.append(arith.cut_as_integer(val) * arith._config.minimum_step_as_rational)
-        out = np.asarray(out)
         return np.asarray(out)
 
     @staticmethod

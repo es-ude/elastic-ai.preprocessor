@@ -12,22 +12,18 @@ class TestWaveformGenerator(TestCase):
     _period: float = 0.01
 
     def test_result_value_length(self):
-        dict = WaveformGenerator(
-            sampling_rate=self._sampling_rate, add_noise=False
-        ).get_dictionary_classes()
+        dict = WaveformGenerator(sampling_rate=self._sampling_rate).get_dictionary_classes()
         self.assertTrue(len(dict) > 0)
 
     def test_result_value_available_waveforms(self):
-        dict = WaveformGenerator(
-            sampling_rate=self._sampling_rate, add_noise=False
-        ).get_dictionary_classes()
+        dict = WaveformGenerator(sampling_rate=self._sampling_rate).get_dictionary_classes()
         types_to_check = ["RECT_HALF", "LIN_RISE", "LIN_FALL", "SAW_POS", "SAW_NEG"]
         types_checked = [True for type in types_to_check if type in dict]
         self.assertTrue(np.sum(types_checked) == len(types_to_check))
 
     def test_waveform_zero_zero_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -41,7 +37,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_rect_zero_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -55,7 +51,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_rect_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -69,7 +65,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_square_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -83,7 +79,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_square_content(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[10 / self._sampling_rate],
@@ -97,7 +93,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_lin_rise_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -111,7 +107,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_lin_fall_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -125,7 +121,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_lin_rise_fall_equal(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[
                     1 / self._sampling_rate,
@@ -142,7 +138,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_sine_half_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -156,7 +152,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_sine_half_inv_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -170,7 +166,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_sine_half_equal(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[
                     1 / self._sampling_rate,
@@ -187,7 +183,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_sine_full_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -201,7 +197,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_tri_half_content_length_one(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -215,7 +211,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_tri_half_content_length_two(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[2 * self._period],
@@ -229,7 +225,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_tri_full_content_length_one(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -243,7 +239,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_tri_full_content(self):
         signal = (
-            WaveformGenerator(12, add_noise=False)
+            WaveformGenerator(12)
             .generate_waveform(
                 time_points=[0.0],
                 time_duration=[1.0],
@@ -272,7 +268,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_saw_pos_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -286,7 +282,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_saw_neg_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -300,7 +296,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_saw_pos_neg_equal(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate, 1 / self._sampling_rate],
                 time_duration=[self._period, self._period],
@@ -313,7 +309,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_gauss_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -327,7 +323,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_eap_content(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[2e-3],
@@ -386,7 +382,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_eap_content_length(self):
         signal = (
-            WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False)
+            WaveformGenerator(sampling_rate=self._sampling_rate)
             .generate_waveform(
                 time_points=[1 / self._sampling_rate],
                 time_duration=[self._period],
@@ -399,9 +395,7 @@ class TestWaveformGenerator(TestCase):
         self.assertEqual(length_content.size, int(1.6e-3 * self._sampling_rate))
 
     def test_waveform_biphasic_content_length(self):
-        signal = WaveformGenerator(
-            sampling_rate=self._sampling_rate, add_noise=False
-        ).generate_biphasic_waveform(
+        signal = WaveformGenerator(sampling_rate=self._sampling_rate).generate_biphasic_waveform(
             anodic_wvf="SINE_HALF",
             anodic_duration=self._period / 2,
             cathodic_wvf="SINE_HALF",
@@ -414,9 +408,7 @@ class TestWaveformGenerator(TestCase):
         self.assertEqual(length_content.size + 2, int(self._period * self._sampling_rate))
 
     def test_waveform_biphasic_charge_density(self):
-        signal = WaveformGenerator(
-            sampling_rate=self._sampling_rate, add_noise=False
-        ).generate_biphasic_waveform(
+        signal = WaveformGenerator(sampling_rate=self._sampling_rate).generate_biphasic_waveform(
             anodic_wvf="SINE_HALF",
             anodic_duration=self._period / 2,
             cathodic_wvf="SINE_HALF",
@@ -425,15 +417,11 @@ class TestWaveformGenerator(TestCase):
             do_cathodic_first=False,
             do_charge_balancing=False,
         )["y"]
-        dq = WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False).check_charge_balancing(
-            signal
-        )
+        dq = WaveformGenerator(sampling_rate=self._sampling_rate).check_charge_balancing(signal)
         self.assertEqual(dq, 0.0)
 
     def test_waveform_biphasic_asymmetric_charge_density(self):
-        signal = WaveformGenerator(
-            sampling_rate=self._sampling_rate, add_noise=False
-        ).generate_biphasic_waveform(
+        signal = WaveformGenerator(sampling_rate=self._sampling_rate).generate_biphasic_waveform(
             anodic_wvf="SINE_HALF",
             anodic_duration=self._period / 2,
             cathodic_wvf="SINE_HALF",
@@ -442,14 +430,12 @@ class TestWaveformGenerator(TestCase):
             do_cathodic_first=False,
             do_charge_balancing=True,
         )["y"]
-        dq = WaveformGenerator(sampling_rate=self._sampling_rate, add_noise=False).check_charge_balancing(
-            signal
-        )
+        dq = WaveformGenerator(sampling_rate=self._sampling_rate).check_charge_balancing(signal)
         np.testing.assert_almost_equal(dq, 0.0, decimal=2)
 
     def test_waveform_quant_sine_unsigned_unoptimized(self):
         out = (
-            WaveformGenerator(sampling_rate=12, add_noise=False)
+            WaveformGenerator(sampling_rate=12)
             .generate_waveform_quant_fxp(
                 time_points=[0],
                 time_duration=[1],
@@ -469,7 +455,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_quant_sine_signed_unoptimized(self):
         out = (
-            WaveformGenerator(sampling_rate=12, add_noise=False)
+            WaveformGenerator(sampling_rate=12)
             .generate_waveform_quant_fxp(
                 time_points=[0],
                 time_duration=[1],
@@ -489,7 +475,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_quant_sine_signed_optimized(self):
         out = (
-            WaveformGenerator(sampling_rate=12, add_noise=False)
+            WaveformGenerator(sampling_rate=12)
             .generate_waveform_quant_fxp(
                 time_points=[0],
                 time_duration=[1],
@@ -507,7 +493,7 @@ class TestWaveformGenerator(TestCase):
 
     def test_waveform_quant_triangular_unsigned_unoptimized(self):
         out = (
-            WaveformGenerator(sampling_rate=12, add_noise=False)
+            WaveformGenerator(sampling_rate=12)
             .generate_waveform_quant_fxp(
                 time_points=[0],
                 time_duration=[1],
@@ -527,7 +513,7 @@ class TestWaveformGenerator(TestCase):
         np.testing.assert_array_equal(out, ref)
 
     def test_build_random_timestamps(self):
-        rslt = WaveformGenerator(sampling_rate=20e3, add_noise=False).build_random_timestamps(
+        rslt = WaveformGenerator(sampling_rate=20e3).build_random_timestamps(
             count=100, min_gap=0.002, max_gap=0.01
         )
         self.assertEqual(len(rslt), 100)
@@ -536,7 +522,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_lut_full"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        WaveformGenerator(100.0, False).create_design(
+        WaveformGenerator(100.0).create_design(
             waveform="SINE_FULL",
             num_params=21,
             is_signed=False,
@@ -556,7 +542,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_lut_opt"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        WaveformGenerator(100.0, False).create_design(
+        WaveformGenerator(100.0).create_design(
             waveform="SINE_FULL",
             num_params=11,
             is_signed=True,
@@ -576,7 +562,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_ram_full"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        WaveformGenerator(100.0, False).create_design(
+        WaveformGenerator(100.0).create_design(
             waveform="SINE_FULL",
             num_params=11,
             target="fpga",
@@ -598,7 +584,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_ram_opt"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        WaveformGenerator(100.0, False).create_design(
+        WaveformGenerator(100.0).create_design(
             waveform="SINE_FULL",
             num_params=11,
             target="fpga",
@@ -620,7 +606,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_lut_full_c"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        WaveformGenerator(sampling_rate=1.0, add_noise=False).create_design(
+        WaveformGenerator(sampling_rate=1.0).create_design(
             waveform="SINE_FULL",
             num_params=21,
             target="mcu",
@@ -643,7 +629,7 @@ class TestWaveformGenerator(TestCase):
         path2save = get_path_to_project("build_files") / "waveform_lut_opt_c"
         path2save.mkdir(parents=True, exist_ok=True)
 
-        WaveformGenerator(sampling_rate=1.0, add_noise=False).create_design(
+        WaveformGenerator(sampling_rate=1.0).create_design(
             waveform="SINE_FULL",
             num_params=11,
             target="mcu",

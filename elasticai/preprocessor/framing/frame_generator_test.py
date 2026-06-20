@@ -15,7 +15,7 @@ from .frame_generator import (
 
 def _build_spike_waveform(sampling_rate: float) -> np.ndarray:
     return (
-        WaveformGenerator(sampling_rate=sampling_rate, add_noise=False)
+        WaveformGenerator(sampling_rate=sampling_rate)
         .generate_waveform(
             time_points=[0.0],
             time_duration=[1.6e-3],
@@ -55,7 +55,7 @@ def _build_spike_signal(
 
 
 def _build_sorted_timestamps(count: int, min_gap: float = 0.002, max_gap: float = 0.01) -> list:
-    return WaveformGenerator(sampling_rate=0.0, add_noise=False).build_random_timestamps(
+    return WaveformGenerator(sampling_rate=0.0).build_random_timestamps(
         count=count,
         min_gap=min_gap,
         max_gap=max_gap,
