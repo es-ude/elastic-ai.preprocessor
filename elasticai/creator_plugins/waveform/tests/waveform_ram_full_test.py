@@ -172,7 +172,7 @@ def test_waveform_ram_full_normal_build2(
     cocotb_test_fixture: CocotbTestFixture, bitwidth: int, num_params: int, is_signed: bool
 ):
     build_dir = cocotb_test_fixture.get_artifact_dir() / "verilog"
-    data0 = WaveformGenerator(100.0, False).create_design(
+    data0 = WaveformGenerator(100.0).create_design(
         waveform="SINE_FULL",
         num_params=num_params,
         is_signed=is_signed,
