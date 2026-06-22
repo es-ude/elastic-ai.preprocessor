@@ -1,10 +1,8 @@
 from pathlib import Path
 from typing import Any
 
-import elasticai.creator.ir2verilog as ir
-from elasticai.creator.file_generation import find_project_root as get_path_to_build
-from elasticai.creator.ir import Registry, attribute
-from elasticai.creator.ir2verilog import Ir2Verilog, factory
+from elasticai.preprocessor import get_path_to_project
+from elasticai.preprocessor.translation import load_and_build_form_plugin
 
 
 def load_and_plugin(
@@ -12,35 +10,6 @@ def load_and_plugin(
     id: str,
     params: dict[str, Any],
     packages: list = ["player"],
-    path2save: Path = get_path_to_build() / "build",
+    path2save: Path = get_path_to_project() / "build",
 ) -> None:
-    def _load_and_plugin_design(
-        type: str, id: str, params: dict[str, Any], packages: list, path2save: Path
-    ) -> None:
-        design = _build_verilog_implementation(type=type, id=id, params=params)
-
-        build_dir = Path(f"{path2save}/")
-        build_dir.mkdir(exist_ok=True)
-
-        translate = _prepare_translator(packages)
-        for name, content in translate(design, Registry()):
-            (build_dir / name).write_text("".join(content))
-
-    _load_and_plugin_design(type, id, params, packages, path2save)
-
-
-def _build_verilog_implementation(type: str, id: str, params: dict[str, Any]) -> ir.DataGraph:
-    mod_name = f"{type}_{id}" if id else f"{type}"
-    return factory.graph(
-        attributes=attribute(**params),
-        type=type,
-        name=mod_name.lower(),
-    )
-
-
-def _prepare_translator(plugin_types: list[str]) -> Ir2Verilog:
-    _translate = Ir2Verilog()
-    loader = ir.PluginLoader(_translate)
-    for plugin in plugin_types:
-        loader.load_from_package(plugin)
-    return _translate
+    load_and_build_form_plugin(type, id, params, packages, path2save)
