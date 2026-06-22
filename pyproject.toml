@@ -25,9 +25,7 @@ dynamic = ["version"]
 [dependency-groups]
 dev = [
   "build>=1.2.2.post1",
-  "cffi>=2.0.0",
   "coverage>=7.11.3",
-  "hypothesis>=6.152.9",
   "matplotlib>=3.10.9",
   "pip-audit>=2.10.1",
   "pre-commit>=4.0.1",
@@ -86,7 +84,6 @@ exclude_lines = [
 source = "vcs"
 
 [tool.hatch.build.targets.sdist]
-# where = ["."]
 include = ["elasticai"]
 exclude = [
   ".venv",
@@ -107,10 +104,8 @@ exclude = [
   "plugins_python",
   "**/*_test.py"
 ]
-# only-packages = true
 
 [tool.pytest]
-# addopts = ["--import-mode=importlib"]
 markers = [
   "simulation: a slow simulation test",
 ]

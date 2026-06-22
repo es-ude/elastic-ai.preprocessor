@@ -2,22 +2,21 @@ from pathlib import Path
 
 
 def get_path_to_project(new_folder: str = "") -> Path:
-    """Function for getting the root path to of the project
-    :param new_folder:  String with new folder
-    :return:            Path with absolute path to entry point of the project
+    """Function for getting the path to find the project folder structure in application.
+    :param new_folder:  New folder path
+    :return:            String of absolute path to start the project structure
     """
     max_levels = 5
-    cwd = Path(".").absolute()
-    current = cwd
+    current = Path("..").absolute()
 
-    def is_project_root(p):
+    def is_project_root(p: Path) -> bool:
         return (p / "pyproject.toml").exists()
 
     for _ in range(max_levels):
         if is_project_root(current):
-            return current / new_folder
+            continue
         current = current.parent
-
-    if is_project_root(current):
-        return current / new_folder
-    return cwd
+    if new_folder:
+        return current.absolute() / new_folder
+    else:
+        return current.absolute()

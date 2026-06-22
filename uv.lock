@@ -453,9 +453,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "build" },
-    { name = "cffi" },
     { name = "coverage" },
-    { name = "hypothesis" },
     { name = "matplotlib" },
     { name = "pip-audit" },
     { name = "pre-commit" },
@@ -497,9 +495,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.2.2.post1" },
-    { name = "cffi", specifier = ">=2.0.0" },
     { name = "coverage", specifier = ">=7.11.3" },
-    { name = "hypothesis", specifier = ">=6.152.9" },
     { name = "matplotlib", specifier = ">=3.10.9" },
     { name = "pip-audit", specifier = ">=2.10.1" },
     { name = "pre-commit", specifier = ">=4.0.1" },
