@@ -33,10 +33,6 @@ in {
     };
   };
 
-  processes = {
-    serve_docs.exec = "serve_docs";
-  };
-
   scripts = let
     uv_run = "${pkgs-unstable.uv}/bin/uv run --active";
     alej_run = "${pkgs.alejandra}/bin/alejandra";
@@ -68,16 +64,18 @@ in {
   in {
     "project:sync" = {
      exec = ''
-        ${pkgs-unstable.uv}/bin/uv sync
+        ${uv_run} sync
      '';
     };
     "package:build" = {
-      exec = "${uv_build}";
+      exec = ''
+        ${uv_build}
+      '';
     };
     "docs:check" = {
       exec = ''
         export LC_ALL=C  # necessary to run in github action
-        ${uv_run} sphinx-build -b html docs build/docs
+        ${uv_run} sphinx-build -b singlehtml docs build/docs
       '';
       after = ["docs:clean"];
     };
@@ -94,6 +92,12 @@ in {
         rm -rf build/docs/*
       '';
       before = ["docs:build"];
+    };
+    "test:init" = {
+      exec = ''
+        rm -rf .testmondata*
+        ${uv_run} pytest --testmon -m 'not (simulation or slow or plot)' --reruns 3
+      '';
     };
     "test:changes" = {
       exec = ''
