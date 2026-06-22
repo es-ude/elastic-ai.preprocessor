@@ -1,6 +1,5 @@
 [project]
 name = "elasticai.preprocessor"
-version = "0.1.0"
 description = "Python Extension for Hardware-Aware Signal Processing"
 readme = "README.md"
 requires-python = ">=3.12, <3.14"
@@ -21,6 +20,7 @@ dependencies = [
   "numpy>=2.4.6",
   "scipy>=1.17.1",
 ]
+dynamic = ["version"]
 
 [dependency-groups]
 dev = [
@@ -71,6 +71,15 @@ omit = [
   "**/utils.py",
   "**/__init__.py",
   "**/_*.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "def plot_",
+  "raise",
+  "case _:",
+  "pragma",
+  "continue",
 ]
 
 [tool.hatch.version]
