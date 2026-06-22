@@ -443,7 +443,6 @@ dependencies = [
 
 [[package]]
 name = "elasticai-preprocessor"
-version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "elasticai-creator" },

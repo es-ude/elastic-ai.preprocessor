@@ -26,12 +26,9 @@ in {
     python = {
       enable = true;
       version = "3.13";
-      venv.enable = true;
       uv = {
         enable = true;
         package = pkgs-unstable.uv;
-        sync.enable = true;
-        sync.allGroups = true;
       };
     };
   };
@@ -41,7 +38,7 @@ in {
   };
 
   scripts = let
-    uv_run = "${pkgs-unstable.uv}/bin/uv run";
+    uv_run = "${pkgs-unstable.uv}/bin/uv run --active";
     alej_run = "${pkgs.alejandra}/bin/alejandra";
     tombi_run = "${pkgs.tombi}/bin/tombi";
   in {
@@ -59,9 +56,14 @@ in {
   };
 
   tasks = let
-    uv_run = "${pkgs-unstable.uv}/bin/uv run";
+    uv_run = "${pkgs-unstable.uv}/bin/uv run --active";
     uv_build = "${pkgs-unstable.uv}/bin/uv build";
   in {
+    "project:sync" = {
+     exec = ''
+        ${pkgs-unstable.uv}/bin/uv sync
+     '';
+    };
     "package:build" = {
       exec = "${uv_build}";
     };
@@ -88,7 +90,7 @@ in {
     };
     "test:changes" = {
       exec = ''
-        ${uv_run} pytest --testmon --testmon-off
+        ${uv_run} pytest --testmon
       '';
     };
     "test:fast" = {
@@ -108,13 +110,14 @@ in {
     };
     "test:coverage" = {
       exec = ''
-        ${uv_run} coverage run -m pytest -m 'not simulation' --reruns 3
+        ${uv_run} coverage run -m pytest --reruns 3
       '';
     };
     "check:coverage-report" = {
       exec = ''
         ${uv_run} coverage report -m
         ${uv_run} coverage xml
+        ${uv_run} coverage html
       '';
       after = ["test:coverage"];
     };
@@ -140,7 +143,7 @@ in {
     };
     "check:local" = {
       after = [
-        "test:changes"
+        "test:fast"
         "check:python-lint"
         "check:python-types"
         "check:toml-lint"
