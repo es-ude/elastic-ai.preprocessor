@@ -90,7 +90,6 @@ exclude = [
   "build*",
   "equi_checker",
   "plugins_c",
-  "plugins_python",
   "**/*_test.py"
 ]
 
@@ -101,7 +100,6 @@ exclude = [
   "build*",
   "equi_checker",
   "plugins_c",
-  "plugins_python",
   "**/*_test.py"
 ]
 
@@ -110,7 +108,7 @@ markers = [
   "simulation: a slow simulation test",
 ]
 minversion = "9.0"
-norecursedirs = ["plugins_c", "plugins_python"]
+norecursedirs = ["plugins_c"]
 python_files = ["*_test.py"]
 pythonpath = ["."]
 testpaths = ["elasticai/*"]
@@ -120,7 +118,7 @@ include = [
   "pyproject.toml",
   "elasticai/**/*.py",
 ]
-exclude = [".venv", "build*", "equi_checker", "plugins_c", "plugins_python"]
+exclude = [".venv", "build*", "equi_checker", "plugins_c"]
 # Same as Black.
 line-length = 106
 indent-width = 4
