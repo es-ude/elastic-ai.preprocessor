@@ -2,44 +2,22 @@ import cocotb
 import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, FallingEdge, Timer
-from random import Random
+from random import randint
+import numpy as np
 
+from elasticai.creator.arithmetic import FxpParams
 from elasticai.creator.testing import CocotbTestFixture, eai_testbench
 from elasticai.creator_plugins.windower.utils import load_and_plugin
+from elasticai.preprocessor.windower import WindowSequencer, SettingsWindow
 
 
-def build_testdata(bitwidth: int, samples: int, num_shift: int, repeats: int = 8) -> list[int]:
-    max_value = 2**bitwidth - 1
-    rng = Random((bitwidth << 16) + (samples << 8) + num_shift)
+def build_testdata(bitwidth: int, is_signed: bool, samples: int, repeats: int = 8) -> list[int]:
+    params = FxpParams(total_bits=bitwidth, frac_bits=0, signed=is_signed)
 
-    data = [rng.randint(0, max_value) for _ in range(repeats * samples)]
-
-    if len(data) >= 1:
-        data[0] = 0
-    if len(data) >= 2:
-        data[1] = max_value
-
+    data = [randint(a=params.minimum_as_integer, b=params.maximum_as_integer) for _ in range(repeats * samples)]
+    data.append(params.minimum_as_integer)
+    data.append(params.maximum_as_integer)
     return data
-
-
-def build_check(data_in: list[int], bitwidth: int, samples: int, num_shift: int) -> list[int]:
-    shifted_values: list[int] = []
-    check: list[int] = []
-
-    for idx, value in enumerate(data_in, start=1):
-        shifted_values.append(value)
-
-        if idx % num_shift == 0:
-            window = list(reversed(shifted_values[-samples:]))
-            window.extend([0] * (samples - len(window)))
-
-            packed_window = 0
-            for sample_idx, sample in enumerate(window):
-                packed_window |= (sample) << (sample_idx * bitwidth)
-
-            check.append(packed_window)
-
-    return check
 
 
 @cocotb.test()
@@ -77,12 +55,22 @@ async def check_transfer_function(dut, bitwidth: int, samples: int, num_shift: i
     await Timer(1, unit="ps")
     assert dut.DVALID.value == 0
 
-    data_buf_out: list[int] = []
+    data_buf_out: list[list[int]] = []
 
     async def collect_if_valid() -> None:
         await Timer(1, unit="ps")
         if dut.DVALID.value == 1:
-            data_buf_out.append(dut.DATA_BUF.value.to_unsigned())
+            # DATA_BUF is one packed Verilog bit vector.
+            packed_window = dut.DATA_BUF.value.to_unsigned()
+
+            # Unpack DATA_BUF into 'samples' values of 'bitwidth' bits each.
+            window = [
+                (packed_window >> (sample_idx * bitwidth)) & ((1 << bitwidth) - 1)
+                for sample_idx in range(samples)
+            ]
+
+            # Convert from DUT order (newest first) to reference order (oldest first).
+            data_buf_out.append(list(reversed(window)))
 
     for value in data_in:
         await RisingEdge(dut.CLK_SYS)
@@ -103,6 +91,9 @@ async def check_transfer_function(dut, bitwidth: int, samples: int, num_shift: i
     for _ in range(num_shift + 2):
         await RisingEdge(dut.CLK_SYS)
         await collect_if_valid()
+    
+    print("out first window:", data_buf_out[0])
+    print("check first window:", check[0])
 
     assert data_buf_out == check
 
@@ -117,15 +108,30 @@ def test_windower(
     samples: int,
     num_shift: int,
 ):
-    data_in = build_testdata(bitwidth=bitwidth, samples=samples, num_shift=num_shift, repeats=8)
-    check = build_check(data_in=data_in, bitwidth=bitwidth, samples=samples, num_shift=num_shift)
-    cocotb_test_fixture.write({"data_in": data_in, "check": check})
+    sampling_rate = 100
+    dut = WindowSequencer(
+        SettingsWindow(
+            sampling_rate=sampling_rate,
+            window_sec=samples / sampling_rate,
+            overlap_sec=(samples - num_shift) / sampling_rate,
+        )
+    )
 
+    data_in = build_testdata(bitwidth=bitwidth, is_signed=False, samples=samples, repeats=8)
+
+    signal = np.pad(
+        np.asarray(data_in),
+        (samples - num_shift, 0),
+        mode="constant",
+    )
+
+    data_checked = dut.slide(signal).tolist()
+
+    cocotb_test_fixture.write({"data_in": data_in, "check": data_checked})
     cocotb_test_fixture.set_top_module_name("WINDOWER")
     cocotb_test_fixture.clear_srcs()
-
     cocotb_test_fixture.add_srcs_from_package("windower", "verilog/ring_buffer.v",)
-    cocotb_test_fixture.add_srcs_from_package("windower","verilog/windower.v",)
+    cocotb_test_fixture.add_srcs_from_package("windower", "verilog/windower.v",)
 
     cocotb_test_fixture.run(
         params={
@@ -147,11 +153,26 @@ def test_windower_build(
     samples: int,
     num_shift: int,
 ):
-    data_in = build_testdata(bitwidth=bitwidth, samples=samples, num_shift=num_shift, repeats=8, )
-    check = build_check(data_in=data_in, bitwidth=bitwidth, samples=samples, num_shift=num_shift)
-    cocotb_test_fixture.write({"data_in": data_in, "check": check})
-    
+    sampling_rate = 100
+    dut = WindowSequencer(
+        SettingsWindow(
+            sampling_rate=sampling_rate,
+            window_sec=samples / sampling_rate,
+            overlap_sec=(samples - num_shift) / sampling_rate,
+        )
+    )
+
     build_dir = cocotb_test_fixture.get_artifact_dir() / "verilog"
+
+    data_in = build_testdata(bitwidth=bitwidth, is_signed=False, samples=samples, repeats=8)
+
+    signal = np.pad(
+        np.asarray(data_in),
+        (samples - num_shift, 0),
+        mode="constant",
+    )
+
+    data_checked = dut.slide(signal).tolist()
 
     load_and_plugin(
         type="windower",
@@ -162,7 +183,11 @@ def test_windower_build(
         add_ringbuffer=True,
     )
 
+    cocotb_test_fixture.write({"data_in": data_in, "check": data_checked})
+    cocotb_test_fixture.set_top_module_name("WINDOWER")
     cocotb_test_fixture.clear_srcs()
     cocotb_test_fixture.add_srcs_from_artifact_dir("verilog/*.v")
-    cocotb_test_fixture.set_top_module_name("WINDOWER")
-    cocotb_test_fixture.run(params={}, defines={})
+    cocotb_test_fixture.run(
+        params={}, 
+        defines={},
+    )
