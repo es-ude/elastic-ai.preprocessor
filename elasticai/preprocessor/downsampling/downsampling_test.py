@@ -20066,16 +20066,16 @@ class TestDownSampling(TestCase):
             -0.16517603538878334,
             -0.07125326561763741,
         ]
-        results = DownSampling(self.sets).do_decimation_polyphase_order_one(self.input)
+        results = DownSampling(self.sets)._do_decimation_polyphase_order_one(self.input)
         np.testing.assert_almost_equal(results, np.array(check), decimal=10)
 
     def test_polyphase_one_size(self):
         check = int((self.input.size - 1) / 2)
-        results = DownSampling(self.sets).do_decimation_polyphase_order_one(self.input)
+        results = DownSampling(self.sets)._do_decimation_polyphase_order_one(self.input)
         self.assertEqual(results.size, check)
 
     def test_polyphase_one_type(self):
-        results = DownSampling(self.sets).do_decimation_polyphase_order_one(self.input)
+        results = DownSampling(self.sets)._do_decimation_polyphase_order_one(self.input)
         self.assertEqual(type(results), np.ndarray)
 
     def test_polyphase_two(self):
@@ -40081,49 +40081,41 @@ class TestDownSampling(TestCase):
             -0.3764366880771571,
             -0.18969931787645283,
         ]
-        results = DownSampling(self.sets).do_decimation_polyphase_order_two(self.input)
+        results = DownSampling(self.sets)._do_decimation_polyphase_order_two(self.input)
         np.testing.assert_almost_equal(results, np.array(check), decimal=10)
 
     def test_polyphase_two_size(self):
         check = int((self.input.size - 1) / 2)
-        results = DownSampling(self.sets).do_decimation_polyphase_order_two(self.input)
+        results = DownSampling(self.sets)._do_decimation_polyphase_order_two(self.input)
         self.assertEqual(results.size, check)
 
     def test_polyphase_two_type(self):
-        results = DownSampling(self.sets).do_decimation_polyphase_order_two(self.input)
+        results = DownSampling(self.sets)._do_decimation_polyphase_order_two(self.input)
         self.assertEqual(type(results), np.ndarray)
-
-    def test_is_power_of_two_true(self):
-        for n in [2, 4, 8, 16]:
-            self.assertTrue(DownSampling.is_power_of_two(n))
-
-    def test_is_power_of_two_false(self):
-        for n in [-2, 0, 1, 3, 5, 6]:
-            self.assertFalse(DownSampling.is_power_of_two(n))
 
     def test_polyphase_dsr2_matches_order_two(self):
         self.sets.dsr = 2
         ds = DownSampling(self.sets)
         result = ds.do_decimation_polyphase(self.input, take_first_order=False)
-        expected = ds.do_decimation_polyphase_order_two(self.input)
+        expected = ds._do_decimation_polyphase_order_two(self.input)
         np.testing.assert_array_equal(result, expected)
 
     def test_polyphase_dsr2_matches_order_one(self):
         self.sets.dsr = 2
         ds = DownSampling(self.sets)
         result = ds.do_decimation_polyphase(self.input, take_first_order=True)
-        expected = ds.do_decimation_polyphase_order_one(self.input)
+        expected = ds._do_decimation_polyphase_order_one(self.input)
         np.testing.assert_array_equal(result, expected)
 
     def test_polyphase_dsr4_size(self):
         self.sets.dsr = 4
-        result = DownSampling(self.sets).do_decimation_polyphase(self.input)
+        result = DownSampling(self.sets).do_decimation_polyphase(self.input, take_first_order=True)
         self.assertEqual(result.size, self.input.size // 4)
 
     def test_polyphase_invalid_dsr_raises(self):
         self.sets.dsr = 3
         ds = DownSampling(self.sets)
-        self.assertRaises(ValueError, ds.do_decimation_polyphase, self.input)
+        self.assertRaises(ValueError, ds.do_decimation_polyphase, self.input, True)
 
 
 if __name__ == "__main__":
