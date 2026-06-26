@@ -29,6 +29,38 @@ class DownSampling:
     def sampling_rate_out(self) -> float:
         return self._settings.sampling_rate / self._settings.dsr
 
+    def do_subsampling(self, data: np.ndarray, augment: bool = False) -> np.ndarray:
+        """Downsample datasets by taking every dsr-th value along the last axis.
+
+        When augment is True, additional samples are generated from the
+        remaining offsets and concatenated along the sample axis. Missing tail
+        values are zero-padded so all generated samples have equal length.
+        """
+        factor = self._settings.dsr
+        if factor < 1:
+            raise ValueError("dsr must be >= 1")
+        if factor == 1:
+            return data
+        if data.ndim < 2:
+            raise ValueError("subsampling expects a sample axis")
+
+        output_length = data[..., 0::factor].shape[-1]
+        downsampled_offsets = [
+            self._pad_last_axis(data[..., offset::factor], output_length)
+            for offset in range(factor)
+        ]
+        if not augment:
+            return downsampled_offsets[0]
+        return np.concatenate(downsampled_offsets, axis=0)
+
+    @staticmethod
+    def _pad_last_axis(data: np.ndarray, output_length: int) -> np.ndarray:
+        pad_length = output_length - data.shape[-1]
+        if pad_length <= 0:
+            return data
+        padding = np.zeros(data.shape[:-1] + (pad_length,), dtype=data.dtype)
+        return np.concatenate([data, padding], axis=-1)
+
     def do_simple(self, uin: np.ndarray) -> np.ndarray:
         """Performing a simple downsampling of the adc data stream
         param uin:          Numpy array with transient signal input (high sampling rate)

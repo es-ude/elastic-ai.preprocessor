@@ -44085,6 +44085,90 @@ class TestDownSampling(TestCase):
         results = DownSampling(self.sets)._do_decimation_polyphase_order_two(self.input)
         self.assertEqual(type(results), np.ndarray)
 
+    def test_do_subsampling_without_augmentation_returns_offset_zero_only(self):
+        self.sets.dsr = 3
+        data = np.array(
+            [
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+            ]
+        )
+
+        results = DownSampling(self.sets).do_subsampling(data, augment=False)
+
+        np.testing.assert_array_equal(
+            results,
+            np.array(
+                [
+                    [0, 3, 6, 9],
+                    [10, 13, 16, 19],
+                ]
+            ),
+        )
+
+    def test_do_subsampling_generates_offset_samples_without_labels(self):
+        self.sets.dsr = 3
+        data = np.array(
+            [
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+            ]
+        )
+
+        results = DownSampling(self.sets).do_subsampling(data, augment=True)
+
+        np.testing.assert_array_equal(
+            results,
+            np.array(
+                [
+                    [0, 3, 6, 9],
+                    [10, 13, 16, 19],
+                    [1, 4, 7, 0],
+                    [11, 14, 17, 0],
+                    [2, 5, 8, 0],
+                    [12, 15, 18, 0],
+                ]
+            ),
+        )
+
+    def test_do_subsampling_preserves_leading_dimensions(self):
+        self.sets.dsr = 2
+        data = np.array(
+            [
+                [[0, 1, 2, 3, 4], [10, 11, 12, 13, 14]],
+                [[20, 21, 22, 23, 24], [30, 31, 32, 33, 34]],
+            ]
+        )
+
+        results = DownSampling(self.sets).do_subsampling(data, augment=True)
+
+        np.testing.assert_array_equal(
+            results,
+            np.array(
+                [
+                    [[0, 2, 4], [10, 12, 14]],
+                    [[20, 22, 24], [30, 32, 34]],
+                    [[1, 3, 0], [11, 13, 0]],
+                    [[21, 23, 0], [31, 33, 0]],
+                ]
+            ),
+        )
+
+    def test_do_subsampling_factor_one_returns_input_unchanged(self):
+        self.sets.dsr = 1
+        data = np.array([[1, 2, 3], [4, 5, 6]])
+
+        results = DownSampling(self.sets).do_subsampling(data, augment=False)
+
+        np.testing.assert_array_equal(results, data)
+
+    def test_do_subsampling_rejects_invalid_downsampling_ratio(self):
+        self.sets.dsr = 0
+        data = np.array([[1, 2, 3]])
+
+        with self.assertRaisesRegex(ValueError, "dsr must be >= 1"):
+            DownSampling(self.sets).do_subsampling(data)
+
 
 if __name__ == "__main__":
     main()
