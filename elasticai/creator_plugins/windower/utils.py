@@ -30,8 +30,8 @@ def load_and_plugin(
     _load_and_plugin_design(type, id, params, packages, path2save)
     if add_ringbuffer:
         _load_and_plugin_design(
-            "ring_buffer",
-            "",
+            type="ring_buffer",
+            id="",
             params={"BITWIDTH": params["BITWIDTH"], "SAMPLES": params["SAMPLES"]},
             packages=["windower"],
             path2save=path2save,

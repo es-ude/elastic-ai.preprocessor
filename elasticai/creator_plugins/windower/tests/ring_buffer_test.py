@@ -1,26 +1,35 @@
 import cocotb
+import numpy as np
 import pytest
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, FallingEdge
-import numpy as np
-
+from cocotb.triggers import FallingEdge, RisingEdge
 from elasticai.creator.testing import CocotbTestFixture, eai_testbench
+
 from elasticai.creator_plugins.windower.utils import load_and_plugin
 
 
 @cocotb.test()
 @eai_testbench
-async def ring_register_tb(dut, bitwidth: int, samples: int,):
+async def ring_register_tb(
+    dut,
+    bitwidth: int,
+    samples: int,
+):
     period_clk = 5
     period_data = 100
 
     print(dir(dut))
     used_bitwidth = int(dut.BITWIDTH.value)
     used_adrwidth = int(dut.SAMPLES.value)
-    #data_in_array = [np.random.randint(low=0, high=2**used_bitwidth-1) for _ in range(used_adrwidth)]
-    data_in_array = [int(2**(used_bitwidth-1) * (1 + np.cos(2 * np.pi * idx / used_adrwidth))) for idx in range(used_adrwidth)]
+    # data_in_array = [np.random.randint(low=0, high=2**used_bitwidth-1) for _ in range(used_adrwidth)]
+    data_in_array = [
+        int(2 ** (used_bitwidth - 1) * (1 + np.cos(2 * np.pi * idx / used_adrwidth)))
+        for idx in range(used_adrwidth)
+    ]
     data_in_array = [val if val >= 0 else 0 for val in data_in_array]
-    data_in_array = [2**used_bitwidth-1 if val >= 2**used_bitwidth-1 else val for val in data_in_array]
+    data_in_array = [
+        2**used_bitwidth - 1 if val >= 2**used_bitwidth - 1 else val for val in data_in_array
+    ]
     print(data_in_array)
 
     dut.CLK_SYS.value = 0
@@ -30,7 +39,7 @@ async def ring_register_tb(dut, bitwidth: int, samples: int,):
     dut.DATA_IN.value = 0
 
     # Start clock and making reset
-    cocotb.start_soon(Clock(dut.CLK_SYS, period_clk, unit='ns').start())
+    cocotb.start_soon(Clock(dut.CLK_SYS, period_clk, unit="ns").start())
     for _ in range(8):
         await RisingEdge(dut.CLK_SYS)
     for idx in range(4):
@@ -46,7 +55,7 @@ async def ring_register_tb(dut, bitwidth: int, samples: int,):
     dut.EN.value = 1
     for _ in range(4):
         await RisingEdge(dut.CLK_SYS)
-    cocotb.start_soon(Clock(dut.DO_SHIFT, period_data, unit='ns').start())
+    cocotb.start_soon(Clock(dut.DO_SHIFT, period_data, unit="ns").start())
     await FallingEdge(dut.CLK_SYS)
     assert dut.DVALID.value == 0
 
@@ -67,18 +76,20 @@ async def ring_register_tb(dut, bitwidth: int, samples: int,):
 
 
 @pytest.mark.simulation
-@pytest.mark.parametrize("bitwidth", [8])
-@pytest.mark.parametrize("samples", [32])
+@pytest.mark.parametrize("bitwidth", [4, 8, 12])
+@pytest.mark.parametrize("samples", [8, 32])
 def test_ring_buffer(
     cocotb_test_fixture: CocotbTestFixture,
     bitwidth: int,
     samples: int,
 ):
-    cocotb_test_fixture.set_top_module_name("RING_BUFFER")
-
     cocotb_test_fixture.clear_srcs()
-    cocotb_test_fixture.add_srcs_from_package("windower", "verilog/ring_buffer.v",)
+    cocotb_test_fixture.add_srcs_from_package(
+        "windower",
+        "verilog/ring_buffer.v",
+    )
 
+    cocotb_test_fixture.set_top_module_name("RING_BUFFER")
     cocotb_test_fixture.run(
         params={
             "BITWIDTH": bitwidth,
@@ -100,9 +111,12 @@ def test_ring_buffer_build(
 
     load_and_plugin(
         type="ring_buffer",
-        id= "",
-        params={"BITWIDTH": bitwidth, "SAMPLES": samples,},
-        packages={"windower"},
+        id="",
+        params={
+            "BITWIDTH": bitwidth,
+            "SAMPLES": samples,
+        },
+        packages=["windower"],
         path2save=build_dir,
         add_ringbuffer=True,
     )

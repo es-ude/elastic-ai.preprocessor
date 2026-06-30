@@ -24,6 +24,7 @@ def ring_buffer(impl: DataGraph, _: Registry) -> Iterable[Code]:
         .set_prototype("\n".join(read_text(package_path, path2file)))
         .build()
     )
+
     code = list()
     code.append(
         (

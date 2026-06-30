@@ -1,21 +1,18 @@
+from random import randint
+
 import cocotb
 import pytest
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, FallingEdge
-from random import randint
-import numpy as np
-
+from cocotb.triggers import FallingEdge, RisingEdge
 from elasticai.creator.testing import CocotbTestFixture, eai_testbench
+
 from elasticai.creator_plugins.windower.utils import load_and_plugin
 
 
 def build_testdata(bitwidth: int, samples: int) -> list[int]:
     max_value = 2**bitwidth - 1
 
-    data = [
-        randint(0, max_value)
-        for _ in range(samples)
-    ]
+    data = [randint(0, max_value) for _ in range(samples)]
 
     return data
 
@@ -81,13 +78,23 @@ def test_windower_evnt(
     num_shift: int,
 ):
     data_in = build_testdata(bitwidth=bitwidth, samples=samples)
-    cocotb_test_fixture.write({"data_in": data_in,})
+    cocotb_test_fixture.write(
+        {
+            "data_in": data_in,
+        }
+    )
 
     cocotb_test_fixture.set_top_module_name("EVENT_WINDOWER")
 
     cocotb_test_fixture.clear_srcs()
-    cocotb_test_fixture.add_srcs_from_package("windower", "verilog/ring_buffer.v",)
-    cocotb_test_fixture.add_srcs_from_package("windower", "verilog/windower_evnt.v",)
+    cocotb_test_fixture.add_srcs_from_package(
+        "windower",
+        "verilog/ring_buffer.v",
+    )
+    cocotb_test_fixture.add_srcs_from_package(
+        "windower",
+        "verilog/windower_evnt.v",
+    )
 
     cocotb_test_fixture.run(
         params={
@@ -110,14 +117,22 @@ def test_windower_evnt_build(
     num_shift: int,
 ):
     data_in = build_testdata(bitwidth=bitwidth, samples=samples)
-    cocotb_test_fixture.write({"data_in": data_in,})
-    
+    cocotb_test_fixture.write(
+        {
+            "data_in": data_in,
+        }
+    )
+
     build_dir = cocotb_test_fixture.get_artifact_dir() / "verilog"
 
     load_and_plugin(
         type="windower_evnt",
         id="",
-        params={"BITWIDTH": bitwidth, "SAMPLES": samples, "NUM_SHIFT": num_shift,},
+        params={
+            "BITWIDTH": bitwidth,
+            "SAMPLES": samples,
+            "NUM_SHIFT": num_shift,
+        },
         packages=["windower"],
         path2save=build_dir,
         add_ringbuffer=True,

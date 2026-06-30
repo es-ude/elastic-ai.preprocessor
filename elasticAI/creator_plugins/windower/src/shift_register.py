@@ -1,18 +1,19 @@
 from collections.abc import Iterable
+from datetime import datetime
+
+from elasticai.creator.file_generation.resource_utils import read_text
+from elasticai.creator.hdl_ir import DataGraph
 from elasticai.creator.ir2verilog import (
-    type_handler_iterable,
-    Implementation,
     Code,
+    Registry,
     TemplateDirector,
+    type_handler_iterable,
 )
-from importlib import resources as res
 
 
-@type_handler_iterable
-def shift_register(impl: Implementation) -> Iterable[Code]:
+@type_handler_iterable()
+def shift_register(impl: DataGraph, _: Registry) -> Iterable[Code]:
     package_path = "elasticai.creator_plugins.windower"
-    code = list()
-
     path2file = "verilog/shift_register.v"
 
     _template = (
@@ -20,8 +21,19 @@ def shift_register(impl: Implementation) -> Iterable[Code]:
         .parameter("BITWIDTH")
         .parameter("SAMPLES")
         .add_module_name()
-        .set_prototype(res.read_text(package_path, path2file))
+        .set_prototype("\n".join(read_text(package_path, path2file)))
         .build()
     )
-    code.append((impl.name, _template.substitute(impl.attributes)))
+
+    code = list()
+    code.append(
+        (
+            impl.name,
+            _template.substitute(
+                module_name=impl.name.upper(),
+                date_copy_created=datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+                **impl.attributes,
+            ),
+        )
+    )
     return code
