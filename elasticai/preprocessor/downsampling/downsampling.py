@@ -47,8 +47,7 @@ class DownSampling:
 
         output_length = data[..., 0::factor].shape[-1]
         downsampled_offsets = [
-            self._pad_last_axis(data[..., offset::factor], output_length)
-            for offset in range(factor)
+            self._pad_last_axis(data[..., offset::factor], output_length) for offset in range(factor)
         ]
         if not augment:
             return downsampled_offsets[0]
