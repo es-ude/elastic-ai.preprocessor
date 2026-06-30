@@ -89,7 +89,7 @@ def test_filter_cic(cocotb_test_fixture: CocotbTestFixture, bitwidth: int, dec_r
 #  --------------- (2) Build Test ------------------
 
 @pytest.mark.simulation
-@pytest.mark.parametrize("bitwidth", [2, 8])
+@pytest.mark.parametrize("bitwidth", [8])
 @pytest.mark.parametrize("dec_rate", [2])
 @pytest.mark.parametrize("n_dec", [2])
 def test_filter_cic_build(

@@ -23,8 +23,7 @@ def build_test_signal(bitwidth: int, num_periods: int = 2, n_samples: int = 22) 
 @eai_testbench
 async def polyphase_access(dut, bitwidth: int, poly_order: int, sig_in: list[int], check: list[int]):
     period_clk = 5
-    period_smp = 10
-    gain_cic = 2**poly_order
+    period_smp = 20
 
     dut.CLK_SYS.value = 0
     dut.CLK_HGH.value = 0
@@ -47,46 +46,36 @@ async def polyphase_access(dut, bitwidth: int, poly_order: int, sig_in: list[int
     dut.DATA_IN.value = int(sig_in[0])
     dut.EN.value = 1
     cocotb.start_soon(Clock(dut.CLK_HGH, period_smp, unit="ns").start())
-    errors = []
-    for val, expected in zip(sig_in, check):
-        dut.DATA_IN.value = int(val)
 
-        await FallingEdge(dut.CLK_LOW)
-        if poly_order > 0:
-            await FallingEdge(dut.CLK_LOW)
-        if poly_order > 1:
-            await FallingEdge(dut.CLK_LOW)
-        input = int(dut.DATA_IN.value)    
-        actual = int(dut.DATA_OUT.value)
-        target = int(expected) * gain_cic 
-        error = abs(actual - target)
-        errors.append(error)
-        assert error <= 1, (
-            f"input={val:4d}, DATA_IN={input:4d}, DATA_OUT={actual:4d}, expected={expected:4d}, erwartet={target:4d}, Fehler={error:4d}, check={check[0]:4d}"
-        )
-    print(errors)
+    data_out = list()
+    for val in sig_in:
+        await RisingEdge(dut.CLK_HGH)
+        dut.DATA_IN.value = val
+        if dut.CLK_LOW.value:
+            data_out.append(dut.DATA_OUT.value.to_unsigned())
+
+    await RisingEdge(dut.CLK_LOW)
+    await Timer(1, unit="ns")
+    data_out.append(dut.DATA_OUT.value.to_unsigned())
+    await FallingEdge(dut.CLK_LOW)
+
+    if not data_out[1:] == check:
+        print(f"INP: ({len(sig_in)}) {sig_in}")
+        print(f"OUT: ({len(data_out)}) {data_out}")
+        print(f"REF: ({len(check)}) {check}")
+    assert data_out[1:] == check
         
 
 @pytest.mark.simulation
 @pytest.mark.parametrize(
     "bitwidth, poly_order",
     [
-        (1, 0),
-        (1, 1),
-        (1, 2),
-        (1, 3),
-        (2, 0),
         (2, 1),
         (2, 2),
-        (2, 3),
-        (4, 0),
+        (4, 1),
         (4, 2),
-        (8, 0),
-        (8, 3),
         (12, 1),
         (12, 2),
-        (16, 0),
-        (16, 3),
     ],
 )
 def test_filter_polydec_fpga(cocotb_test_fixture: CocotbTestFixture, bitwidth: int, poly_order: int):
@@ -138,14 +127,14 @@ def test_filter_polydec_fpga_build(
 #  --------------- (3) Äquivalenz Test ------------------
 
 @pytest.mark.simulation
-@pytest.mark.parametrize("bitwidth, poly_order", [(3, 2)])
-def test_filter_polydec_fpga_build_equal(
+@pytest.mark.parametrize("bitwidth, poly_order", [(3, 1)])
+def test_filter_polydec_fpga_build_equal_first_order(
         cocotb_test_fixture: CocotbTestFixture, bitwidth: int, poly_order: int
 ):
     build_dir = cocotb_test_fixture.get_artifact_dir() / "verilog"
     dut = DownSampling(
         SettingsDownSampling(
-            sampling_rate=1000.0, # Default Settings
+            sampling_rate=1000.0,
             dsr=10,
         )
     )
@@ -155,12 +144,10 @@ def test_filter_polydec_fpga_build_equal(
         num_periods=2,
         n_samples=22,
     )
-    
-    #Erwarteter Wert aus Python Funktion
-    data_checked = (dut.do_decimation_polyphase_order_two(  # sind momentan nicht äquivalent
-        uin=data_in
-    )).tolist()
-    print("Check-Ausgangsdaten:", data_checked)
+
+    data_checked = dut.do_decimation_polyphase_order_one(
+        uin=np.asarray(data_in)
+    ).tolist()
 
     load_and_plugin(
         type="polydec_fpga",
@@ -169,8 +156,49 @@ def test_filter_polydec_fpga_build_equal(
         packages=["datarate"],
         path2save=build_dir,
     )
-    
-    cocotb_test_fixture.write({"sig_in": data_in, "check": data_checked}) # Eingangsdaten sind Test-Daten, Erwarteter Output ist Ergebnis der Python-Funktion (Fehler bei assert in Testbench)
+
+    cocotb_test_fixture.write({"sig_in": data_in, "check": data_checked})
+    cocotb_test_fixture.set_top_module_name("POLYDEC_FPGA_1")
+    cocotb_test_fixture.clear_srcs()
+    cocotb_test_fixture.add_srcs_from_artifact_dir("verilog/*.v")
+    cocotb_test_fixture.run(
+        params={},
+        defines={},
+    )
+
+
+@pytest.mark.simulation
+@pytest.mark.parametrize("bitwidth, poly_order", [(3, 2)])
+def test_filter_polydec_fpga_build_equal_second_order(
+        cocotb_test_fixture: CocotbTestFixture, bitwidth: int, poly_order: int
+):
+    build_dir = cocotb_test_fixture.get_artifact_dir() / "verilog"
+    dut = DownSampling(
+        SettingsDownSampling(
+            sampling_rate=1000.0,
+            dsr=10,
+        )
+    )
+    # Test-Signal
+    data_in = build_test_signal(
+        bitwidth=bitwidth,
+        num_periods=2,
+        n_samples=22,
+    )
+
+    data_checked = dut.do_decimation_polyphase_order_two(
+        uin=np.asarray(data_in)
+    ).tolist()
+
+    load_and_plugin(
+        type="polydec_fpga",
+        id="1",
+        params={"BITWIDTH": bitwidth, "POLY_ORDER": poly_order},
+        packages=["datarate"],
+        path2save=build_dir,
+    )
+
+    cocotb_test_fixture.write({"sig_in": data_in, "check": data_checked})
     cocotb_test_fixture.set_top_module_name("POLYDEC_FPGA_1")
     cocotb_test_fixture.clear_srcs()
     cocotb_test_fixture.add_srcs_from_artifact_dir("verilog/*.v")

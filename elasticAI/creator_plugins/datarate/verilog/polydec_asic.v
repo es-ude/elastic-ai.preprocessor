@@ -18,8 +18,8 @@
 
 
 module FILTER_POLYDEC_ASIC#(
-    parameter BITWIDTH = 5'd12,
-    parameter POLY_ORDER = 2'd1
+    parameter BITWIDTH = 12,
+    parameter POLY_ORDER = 1
 )(
     input wire CLK_HGH,
 	output wire CLK_LOW,
@@ -37,7 +37,7 @@ module FILTER_POLYDEC_ASIC#(
 
 	// --- Control sequence
 	integer i0;
-	always@(posedge CLK_HGH or negedge RSTN) begin
+	always@(posedge CLK_HGH) begin
 		if(~RSTN) begin
 		     clk_half <= 1'd0;
 			 din_dly_hgh <= 'd0;
@@ -58,11 +58,6 @@ module FILTER_POLYDEC_ASIC#(
                2'd2: begin
                    DATA_OUT <= DATA_IN + {din_dly_hgh, 1'd0} + din_dly_low[0];
                    din_dly_low[0] <= DATA_IN;
-               end
-               2'd3: begin
-                   DATA_OUT <= DATA_IN + (din_dly_hgh + {din_dly_hgh, 1'd0}) + (din_dly_low[0] + {din_dly_low[0], 1'd0}) + din_dly_low[1];
-                   din_dly_low[0] <= DATA_IN;
-                   din_dly_low[1] <= din_dly_hgh;
                end
                default: begin
                    DATA_OUT <= DATA_IN;
